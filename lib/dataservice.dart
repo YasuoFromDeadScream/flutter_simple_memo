@@ -238,7 +238,7 @@ void createData() async {
   debugPrint("createData end");
 }
 
-Future<List<Article>> getArticles() async {
+Future<List<Article>> getArticles(String searchStr) async {
   final database = openDatabase(
     join(await getDatabasesPath(), 'article_database.db'),
     onCreate: (db, version) {
@@ -251,10 +251,19 @@ Future<List<Article>> getArticles() async {
 
   // Get a reference to the database.
   final Database db = await database;
+  debugPrint("spark:" + searchStr);
 
+  List<Map<String, dynamic>> maps;
   // Query the table for all The Dogs.
-  final List<Map<String, dynamic>> maps = await db.query('articles');
+  if(searchStr != null && searchStr.length > 0){
+    debugPrint("1");
+    maps = await db.query('articles',where: 'title like ? or body like ?',whereArgs: ["%$searchStr%","%$searchStr%"]);
+  }else{
+    debugPrint("2");
+    maps = await db.query('articles');
+  }
 
+  debugPrint("maps.length:" + maps.length.toString());
   // Convert the List<Map<String, dynamic> into a List<Dog>.
   return List.generate(maps.length, (i) {
     return Article(

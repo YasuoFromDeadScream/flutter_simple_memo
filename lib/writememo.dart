@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'constants.dart';
 import 'dataservice.dart';
-import 'main.dart';
 
 class WriteMemoPage extends StatefulWidget {
   final RouteObserver<PageRoute> routeObserver;
@@ -40,20 +39,20 @@ class _WriteMemoPageState extends State<WriteMemoPage> with RouteAware {
   }
 
 
-// TextFieldの入力内容が変更された時に呼ばれる
+  // TextFieldの入力内容が変更された時に呼ばれる
   void _handleTextField() {
     // なんか処理書く
     debugPrint("pontern");
     debugPrint(_bodyController.text);
   }
 
-// ウィジェットの初期化時にリスナーを登録
+  // ウィジェットの初期化時にリスナーを登録
   @override
   void initState() {
-    _titleController = TextEditingController(text: "sayaka");
-    _bodyController = TextEditingController(text: "hunge");
-    initTitle = "sayaka";
+    initTitle = "no title";
     initBody = "hunge";
+    _titleController = TextEditingController(text: initTitle);
+    _bodyController = TextEditingController(text: initBody);
 
     super.initState();
     _titleController.addListener(_handleTextField);
@@ -64,7 +63,8 @@ class _WriteMemoPageState extends State<WriteMemoPage> with RouteAware {
   Widget build(BuildContext context) {
     debugPrint("_isAutoFocus：" + _isAutoFocus.toString());
     FloatingActionButton fab = FloatingActionButton(
-      backgroundColor: Color.fromARGB(120, 33, 150, 243),
+      //backgroundColor: Color.fromARGB(120, 33, 150, 243),
+      backgroundColor: Color(0x401EE5DE),
       onPressed: () async {
         var article = Article(
           title: _titleController.text,
@@ -78,7 +78,7 @@ class _WriteMemoPageState extends State<WriteMemoPage> with RouteAware {
         Navigator.of(context).popAndPushNamed("/");
       },
       tooltip: 'Increment',
-      child: Icon(Icons.add),
+      child: Icon(Icons.save,color: Color(0x66FFFFFF),),
       mini: true,
     );
      TextField tTitle = TextField(
@@ -125,15 +125,21 @@ class _WriteMemoPageState extends State<WriteMemoPage> with RouteAware {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text(widget.title),
+            toolbarHeight: kToolbarHeight * 0.5,
+            iconTheme: IconThemeData(
+              color: Colors.black26, //change your color here
+            ),
+            //title: Text(widget.title,style: TextStyle(color: Colors.black),),
+            backgroundColor: Colors.white.withOpacity(0.0),
+            elevation: 0.0,
           ),
           body: Container(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsets.only(right: 8.0 ,left: 8.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 tTitle,
-                Divider(),
+                Divider(height: 8.0,),
                 Expanded(child: tBody)
               ],
             ),
