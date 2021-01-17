@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
     return RootRestorationScope(
         restorationId: 'root',
         child: MaterialApp(
-          title: 'Flutter Demo',
+          title: 'Simple Memo',
           theme: ThemeData(
             // 全体適用
             //fontFamily: "NotoSansCJKJP"
@@ -27,21 +27,15 @@ class MyApp extends StatelessWidget {
             //primarySwatch: Colors.blue,
             primaryColor: kPrimaryColor[600],
             accentColor: Color(0xFF1EE5DE),
-
-            // This makes the visual density adapt to the platform that you run
-            // the app on. For desktop platforms, the controls will be smaller and
-            // closer together (more dense) than on mobile platforms.
             visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
-          //home: WriteMemoPage(title: 'Flutter Demo Home Page'),
-          //home: MyHomePage(title: 'Flutter Demo Home Page'),
           initialRoute: '/',
           routes: {
             // When navigating to the "/" route, build the FirstScreen widget.
-            '/': (context) => MyHomePage(title: 'Flutter Demo Home Page'),
+            '/': (context) => MyHomePage(title: 'Simple Memo'),
             // When navigating to the "/second" route, build the SecondScreen widget.
             '/second': (context) =>
-                WriteMemoPage(title: 'Flutter Demo Home Page'),
+                WriteMemoPage(title: 'Simple Memo'),
           },
           navigatorObservers: [
             _routeObserver, // <= ここ!
@@ -53,15 +47,6 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -69,17 +54,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with RestorationMixin {
-  int _counter = 0;
-  String _search = "";
   Future<List<Article>> _listFuture;
-
-  final List<String> entries = <String>[
-    'A',
-    'B',
-    'C',
-  ];
-
-  //List<Article> articles = <Article>[];
 
   final List<int> colorCodes = <int>[600, 500, 100];
   final RestorableBool isSelectedElevator = RestorableBool(true);
@@ -96,13 +71,21 @@ class _MyHomePageState extends State<MyHomePage> with RestorationMixin {
     registerForRestoration(isSelectedFireplace, 'selected_fireplace');
   }
 
-  void _incrementCounter() {
+  void _writeArticle() {
     Navigator.push(
       context,
       MaterialPageRoute(
           builder: (context) => WriteMemoPage(
-                title: "hungin",
-                routeObserver: _routeObserver,
+              )),
+    );
+  }
+
+  void _editArticle(Article article) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => WriteMemoPage(
+                article: article,
               )),
     );
   }
@@ -115,11 +98,21 @@ class _MyHomePageState extends State<MyHomePage> with RestorationMixin {
     _listFuture = getArticles("");
   }
 
+  String currentSearch = "";
   void refreshList(String str) {
     // reload
+    currentSearch = str;
     debugPrint("refreshList");
     setState(() {
       _listFuture = getArticles(str);
+    });
+  }
+
+  void refreshListWithCurrentSearch() {
+    // reload
+    debugPrint("refreshList");
+    setState(() {
+      _listFuture = getArticles(currentSearch);
     });
   }
 
@@ -131,6 +124,7 @@ class _MyHomePageState extends State<MyHomePage> with RestorationMixin {
       size: size,
       function: refreshList,
     );
+
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -139,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> with RestorationMixin {
         elevation: 0.0,
         actions: <Widget>[
           IconButton(
-            icon: Image.asset("assets/images/logo.png"),
+            icon: Image.asset("assets/icons/icon.png"),
             onPressed: () => setState(() {}),
           )
         ],
@@ -151,51 +145,13 @@ class _MyHomePageState extends State<MyHomePage> with RestorationMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             header,
-/*                    Wrap(
-                      children: [
-                        FilterChip(
-                          selectedColor: Colors.amber,
-                          disabledColor: Colors.black12,
-                          label: Text("note"),
-                          selected: isSelectedElevator.value,
-                          onSelected: (value) {
-                            setState(() {
-                              isSelectedElevator.value =
-                                  !isSelectedElevator.value;
-                            });
-                          },
-                        ),
-                        FilterChip(
-                          label: Text("下書き"),
-                          selected: isSelectedWasher.value,
-                          onSelected: (value) {
-                            setState(() {
-                              isSelectedWasher.value = !isSelectedWasher.value;
-                            });
-                          },
-                        ),
-                        FilterChip(
-                          label: Text("完成版"),
-                          selected: isSelectedFireplace.value,
-                          onSelected: (value) {
-                            setState(() {
-                              isSelectedFireplace.value =
-                                  !isSelectedFireplace.value;
-                            });
-                          },
-                        ),
-                      ],
-                    ),*/
-/*            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),*/
             FutureBuilder(
                 future: _listFuture,
                 builder: (BuildContext context,
                     AsyncSnapshot<List<Article>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return new Expanded(child:Center(
+                    return new Expanded(
+                        child: Center(
                       child: new CircularProgressIndicator(),
                     ));
                   } else if (snapshot.hasError) {
@@ -210,46 +166,42 @@ class _MyHomePageState extends State<MyHomePage> with RestorationMixin {
                             itemCount: articles.length,
                             itemBuilder: (BuildContext context, int index) {
                               return Card(
-                                  child: Column(children: <Widget>[
-//                          Text("aaaa"),
-                                ListTile(
-                                  //                                 leading: FlutterLogo(size: 56.0),
-                                  title: Row(
-                                      mainAxisAlignment: MainAxisAlignment
-                                          .spaceBetween, // これで両端に寄せる
-                                      children: <Widget>[
-                                        Text(
-                                          'no title1',
-                                        ),
-                                        /*Transform(
-                                          transform: new Matrix4.identity()
-                                            ..scale(0.8),
-                                          child: new Chip(
-                                            materialTapTargetSize:
-                                                MaterialTapTargetSize
-                                                    .shrinkWrap,
-                                            label: new Text(
-                                              "Chip",
-                                              overflow: TextOverflow.ellipsis,
-                                              style: new TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                            backgroundColor:
-                                                const Color(0xFFa3bdc4),
+                                  child: InkWell(
+                                      onTap: () {
+                                        debugPrint("tap : " +
+                                            '${articles[index].title}');
+                                        _editArticle(articles[index]);
+                                      },
+                                      child: Column(children: <Widget>[
+                                        ListTile(
+                                          title: Row(
+                                            mainAxisAlignment: MainAxisAlignment
+                                                .spaceBetween, // これで両端に寄せる
+                                            children: <Widget>[
+                                              Text(
+                                                '${articles[index].title}',
+                                              ),
+                                            ],
                                           ),
-                                        ),*/
-                                      ]),
-                                  subtitle: Row(
-                                      mainAxisAlignment: MainAxisAlignment
-                                          .spaceBetween, // これで両端に寄せる
-                                      children: <Widget>[
-                                        Text('${articles[index].title}'),
-                                        Text("更新日：2020/10/10 12:20",
-                                            style: TextStyle(fontSize: 10))
-                                      ]),
-                                  trailing: Icon(Icons.more_vert),
-                                )
-                              ]));
+                                          subtitle: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween, // これで両端に寄せる
+                                              children: <Widget>[
+                                                Text(formatStr('${articles[index].body}')),
+                                                Text(
+                                                    "更新日：${articles[index].updateDate}",
+                                                    style:
+                                                        TextStyle(fontSize: 10))
+                                              ]),
+                                          trailing: IconButton(
+                                            icon: new Icon(Icons.delete),
+                                            onPressed: () {
+                                              _confirmDeleteDialog(articles[index].id);
+                                            },
+                                          ),
+                                        )
+                                      ])));
                             }));
                   }
                 })
@@ -257,7 +209,7 @@ class _MyHomePageState extends State<MyHomePage> with RestorationMixin {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _writeArticle,
         tooltip: 'Increment',
         child: SvgPicture.asset(
           "assets/icons/pen.svg",
@@ -268,15 +220,58 @@ class _MyHomePageState extends State<MyHomePage> with RestorationMixin {
     );
   }
 
-  // ※無限ループなるからsetStateをうったらあかん
-  Future<String> _getFutureValue(String searchStr) async {
-    debugPrint("searchStr:" + searchStr);
-    var resultCode = "";
-    await getArticles(searchStr).then((val) {
-      /*    articles = val;
-        debugPrint("articles:" + articles.toString());*/
-      resultCode = "success";
-    });
-    return Future.value(resultCode);
+  String formatStr(String str){
+    if(str.indexOf("\n") >= 0){
+      str = str.substring(0,str.indexOf("\n"));
+      if(str.length >= 8){
+        return str.substring(0,7) + "...";
+      }else{
+        return str + "...";
+      }
+    }
+    if(str.length >= 8){
+      return str.substring(0,7) + "...";
+    }else{
+      return str;
+    }
+  }
+
+  Future<void> _confirmDeleteDialog(int id) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        debugPrint("id:"+id.toString());
+        return AlertDialog(
+          title: Text('削除しますか？'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('はいを選ぶと'),
+                Text('メモが完全に破棄されます。'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              color: kPrimaryColor,
+              child: Text('いいえ', style: TextStyle(color: Colors.white)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              color: kPrimaryColor,
+              child: Text('はい', style: TextStyle(color: Colors.white)),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                deleteArticle(id);
+                refreshListWithCurrentSearch();
+              },
+            )
+          ],
+        );
+      },
+    );
   }
 }

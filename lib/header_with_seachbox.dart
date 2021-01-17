@@ -17,7 +17,6 @@ class HeaderWithSearchBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(bottom: kDefaultPadding * 1.0),
-      // It will cover 20% of our total height
       height: size.height * 0.11,
       child: Stack(
         children: <Widget>[
@@ -63,9 +62,6 @@ class HeaderWithSearchBox extends StatelessWidget {
                       onChanged: (value) async {
                         await function(value);
                       },
-                      onSubmitted:  (value) async {
-                        //await function("kani");
-                      },
                       decoration: InputDecoration(
                         hintText: "Search",
                         hintStyle: TextStyle(
@@ -73,9 +69,6 @@ class HeaderWithSearchBox extends StatelessWidget {
                         ),
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
-                        // surffix isn't working properly  with SVG
-                        // thats why we use row
-                        // suffixIcon: SvgPicture.asset("assets/icons/search.svg"),
                       ),
                     ),
                   ),
