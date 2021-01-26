@@ -83,11 +83,6 @@ void createData() async {
 Future<List<Article>> getArticles(String searchStr) async {
   final database = openDatabase(
     join(await getDatabasesPath(), 'article_database.db'),
-    onCreate: (db, version) {
-      return db.execute(
-        "CREATE TABLE articles(id INTEGER PRIMARY KEY, title TEXT, body TEXT, updateDate TEXT)",
-      );
-    },
     version: 1,
   );
 

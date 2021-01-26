@@ -128,6 +128,7 @@ class _WriteMemoPageState extends State<WriteMemoPage> with RouteAware {
   }
 
   Future<void> _showMyDialog() async {
+    // ★2 画面遷移を促す為のダイアログを表示する
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -147,8 +148,10 @@ class _WriteMemoPageState extends State<WriteMemoPage> with RouteAware {
               color: kPrimaryColor,
               child: Text('いいえ', style: TextStyle(color: Colors.white)),
               onPressed: () {
+                // ★3 ダイアログを閉じる
                 Navigator.of(context).pop();
                 FocusScope.of(context).unfocus();
+                // ★4 トップ画面へ遷移
                 Navigator.of(context).pop();
               },
             ),

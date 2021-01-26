@@ -72,6 +72,7 @@ class _MyHomePageState extends State<MyHomePage> with RestorationMixin {
   }
 
   void _writeArticle() {
+    // ★1 メモ作成画面への遷移
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -93,6 +94,7 @@ class _MyHomePageState extends State<MyHomePage> with RestorationMixin {
   @override
   void initState() {
     super.initState();
+    createData();
 
     // initial load
     _listFuture = getArticles("");
@@ -160,9 +162,11 @@ class _MyHomePageState extends State<MyHomePage> with RestorationMixin {
                     final articles = snapshot.data ?? <Article>[];
 
                     return Expanded(
+                        // オブジェクト配列でカード表示を行う
                         child: ListView.builder(
                             shrinkWrap: true,
                             padding: const EdgeInsets.all(8),
+                            // ②配列のデータ数分カード表示を行う
                             itemCount: articles.length,
                             itemBuilder: (BuildContext context, int index) {
                               return Card(
@@ -174,19 +178,15 @@ class _MyHomePageState extends State<MyHomePage> with RestorationMixin {
                                       },
                                       child: Column(children: <Widget>[
                                         ListTile(
-                                          title: Row(
-                                            mainAxisAlignment: MainAxisAlignment
-                                                .spaceBetween, // これで両端に寄せる
-                                            children: <Widget>[
+                                          title:
+                                              // ③オブジェクトの属性(タイトル属性)を参照する
                                               Text(
                                                 '${articles[index].title}',
                                               ),
-                                            ],
-                                          ),
                                           subtitle: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment
-                                                      .spaceBetween, // これで両端に寄せる
+                                                      .spaceBetween, // 両端に寄せる
                                               children: <Widget>[
                                                 Text(formatStr('${articles[index].body}')),
                                                 Text(
@@ -197,6 +197,7 @@ class _MyHomePageState extends State<MyHomePage> with RestorationMixin {
                                           trailing: IconButton(
                                             icon: new Icon(Icons.delete),
                                             onPressed: () {
+                                              // 削除の確認ダイアログを表示
                                               _confirmDeleteDialog(articles[index].id);
                                             },
                                           ),
